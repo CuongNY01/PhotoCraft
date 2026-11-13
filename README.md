@@ -73,9 +73,13 @@ python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 - API sẽ lắng nghe tại: `http://localhost:8000` (hoặc `http://10.0.2.2:8000` khi chạy máy ảo Android).
 - Tài liệu tương tác Swagger UI: `http://localhost:8000/docs`.
 
-### 2. Cài đặt & Chạy Ứng dụng Di động
-- **Cài đặt APK trực tiếp lên máy ảo hoặc điện thoại Android thật**:
-  File APK đã được build tại:
+### 2. Cài đặt & Chạy Đa Nền Tảng (Android, iOS, Web)
+
+Ứng dụng PhotoCraft hỗ trợ chạy mượt mà trên cả 3 nền tảng:
+
+#### 📱 A. Android
+- **Cài đặt APK trực tiếp lên máy thật hoặc máy ảo**:
+  File APK đã được biên dịch sẵn tại:
   ```
   mobile_app/build/app/outputs/flutter-apk/app-debug.apk
   ```
@@ -86,11 +90,29 @@ python -m uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 - **Chạy trực tiếp từ mã nguồn Flutter**:
   ```bash
   .\run_android.bat
+  # hoặc: cd mobile_app && flutter run -d android
   ```
-- **Xem trước trực quan ngay trên trình duyệt Chrome**:
+
+#### 🌐 B. Web (Trình duyệt Chrome / Edge / Safari)
+- PhotoCraft tích hợp đầy đủ Web SQLite (`sqflite_common_ffi_web` trên nền IndexedDB) và xử lý ảnh Base64 offline:
   ```bash
   .\run_web.bat
+  # hoặc: cd mobile_app && flutter run -d chrome
   ```
+- **Build production Web**:
+  ```bash
+  cd mobile_app && flutter build web
+  ```
+  Thư mục đầu ra `mobile_app/build/web` sẵn sàng để deploy lên GitHub Pages, Firebase Hosting, Vercel hoặc Netlify.
+
+#### 🍏 C. iOS (iPhone / iPad / Simulator)
+- Cấu hình quyền đầy đủ trong `ios/Runner/Info.plist` (`NSPhotoLibraryUsageDescription`, `NSCameraUsageDescription`, `NSMicrophoneUsageDescription`).
+- **Khởi chạy trên macOS (Xcode / Simulator)**:
+  ```bash
+  cd mobile_app/ios && pod install
+  cd .. && flutter run -d ios
+  ```
+  Hoặc mở thư mục `mobile_app/ios` bằng **Xcode** và nhấn nút **Run** (Cmd + R).
 
 ---
 

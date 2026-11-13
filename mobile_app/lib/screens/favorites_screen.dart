@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:io' show File;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,6 +47,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Widget _buildImage(String path) {
+    if (path.startsWith('data:image/')) {
+      final comma = path.indexOf(',');
+      if (comma != -1) {
+        return Image.memory(
+          base64Decode(path.substring(comma + 1)),
+          fit: BoxFit.cover,
+          width: double.infinity,
+        );
+      }
+    }
     if (path.startsWith('assets/')) {
       return Image.asset(path, fit: BoxFit.cover, width: double.infinity);
     }
@@ -110,7 +121,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     return GestureDetector(
                       onTap: () async {
                         Uint8List? bytes;
-                        if (item.editedPath.startsWith('assets/')) {
+                        if (item.editedPath.startsWith('data:image/')) {
+                          final comma = item.editedPath.indexOf(',');
+                          if (comma != -1) {
+                            bytes = base64Decode(item.editedPath.substring(comma + 1));
+                          }
+                        } else if (item.editedPath.startsWith('assets/')) {
                           final d = await rootBundle.load(item.editedPath);
                           bytes = d.buffer.asUint8List();
                         } else if (!kIsWeb && File(item.editedPath).existsSync()) {

@@ -1,11 +1,11 @@
 {
-    "name": "mobile_app",
-    "short_name": "mobile_app",
+    "name": "PhotoCraft",
+    "short_name": "PhotoCraft",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#12111A",
+    "theme_color": "#00E5FF",
+    "description": "Ứng dụng biên tập & nâng cao chất lượng ảnh đa nền tảng.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

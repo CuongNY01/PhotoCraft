@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:io' show File;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -57,7 +58,7 @@ class _SaveDiarySheetState extends State<SaveDiarySheet> {
 
   Future<String> _saveImageToDisk(Uint8List bytes) async {
     if (kIsWeb) {
-      return 'web_photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      return 'data:image/jpeg;base64,${base64Encode(bytes)}';
     }
     final docDir = await getApplicationDocumentsDirectory();
     final filename = 'photocraft_${DateTime.now().millisecondsSinceEpoch}.jpg';

@@ -1,7 +1,8 @@
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'database/db_helper.dart';
 import 'models/photo_record.dart';
 import 'screens/editor_screen.dart';
@@ -15,8 +16,10 @@ import 'theme/app_theme.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize SQLite for Desktop / Windows test harness
-  if (!kIsWeb && (Platform.isWindows || Platform.isLinux)) {
+  // Initialize SQLite for Web, Desktop (Windows/Linux), and Mobile
+  if (kIsWeb) {
+    databaseFactory = databaseFactoryFfiWeb;
+  } else if (Platform.isWindows || Platform.isLinux) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }

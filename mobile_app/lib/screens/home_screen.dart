@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:io' show File;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -160,6 +161,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildImageWidget(String path) {
+    if (path.startsWith('data:image/')) {
+      final comma = path.indexOf(',');
+      if (comma != -1) {
+        return Image.memory(base64Decode(path.substring(comma + 1)), fit: BoxFit.cover);
+      }
+    }
     if (path.startsWith('assets/')) {
       return Image.asset(path, fit: BoxFit.cover);
     }
@@ -343,7 +350,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         return GestureDetector(
                           onTap: () async {
                             Uint8List? bytes;
-                            if (record.editedPath.startsWith('assets/')) {
+                            if (record.editedPath.startsWith('data:image/')) {
+                              final comma = record.editedPath.indexOf(',');
+                              if (comma != -1) {
+                                bytes = base64Decode(record.editedPath.substring(comma + 1));
+                              }
+                            } else if (record.editedPath.startsWith('assets/')) {
                               final d = await rootBundle.load(record.editedPath);
                               bytes = d.buffer.asUint8List();
                             } else if (!kIsWeb && File(record.editedPath).existsSync()) {

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mobile App</string>
+	<string>PhotoCraft</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,13 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>mobile_app</string>
+	<string>PhotoCraft</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>PhotoCraft cần quyền truy cập thư viện ảnh để bạn có thể chọn và chỉnh sửa hình ảnh.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>PhotoCraft cần quyền sử dụng camera để bạn có thể chụp ảnh mới và bắt đầu biên tập.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>PhotoCraft cần quyền sử dụng microphone khi quay video hoặc chọn media.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

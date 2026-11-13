@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:convert';
+import 'dart:io' show File;
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -117,7 +118,12 @@ class _EditorScreenState extends State<EditorScreen> {
       if (recents.isNotEmpty) {
         final recent = recents.first;
         Uint8List? bytes;
-        if (recent.editedPath.startsWith('assets/')) {
+        if (recent.editedPath.startsWith('data:image/')) {
+          final comma = recent.editedPath.indexOf(',');
+          if (comma != -1) {
+            bytes = base64Decode(recent.editedPath.substring(comma + 1));
+          }
+        } else if (recent.editedPath.startsWith('assets/')) {
           final assetData = await rootBundle.load(recent.editedPath);
           bytes = assetData.buffer.asUint8List();
         } else if (!kIsWeb && File(recent.editedPath).existsSync()) {
