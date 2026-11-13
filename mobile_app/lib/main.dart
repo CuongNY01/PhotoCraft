@@ -1,8 +1,5 @@
-import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'database/db_helper.dart';
 import 'models/photo_record.dart';
 import 'screens/editor_screen.dart';
@@ -17,12 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize SQLite for Web, Desktop (Windows/Linux), and Mobile
-  if (kIsWeb) {
-    databaseFactory = databaseFactoryFfiWeb;
-  } else if (Platform.isWindows || Platform.isLinux) {
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
-  }
+  DBHelper.ensureDatabaseFactoryInitialized();
 
   // Initialize API service and auto-discover server on current Wi-Fi network
   await ApiService.instance.init();

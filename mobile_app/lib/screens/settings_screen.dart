@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../database/db_helper.dart';
 import '../services/api_service.dart';
@@ -132,34 +133,100 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onPressed: _testConnection,
                     ),
                   ),
+                  onChanged: (val) {
+                    setState(() {});
+                  },
                 ),
+                if (kIsWeb && Uri.base.port != 0 && Uri.base.port != 8000 && _urlController.text.contains(':${Uri.base.port}')) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade900.withOpacity(0.25),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade700),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            '⚠️ Cổng ${Uri.base.port} là cổng Web của trình duyệt, không phải cổng Python Backend API. Hãy chọn "Localhost (127.0.0.1)" bên dưới!',
+                            style: const TextStyle(color: Colors.amber, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 10),
 
                 // Quick preset buttons
                 Wrap(
                   spacing: 8,
+                  runSpacing: 6,
                   children: [
                     ActionChip(
-                      label: const Text('Máy ảo Android (10.0.2.2)'),
-                      backgroundColor: AppTheme.surfaceLight,
-                      labelStyle: const TextStyle(fontSize: 11, color: Colors.white),
+                      label: const Text('Localhost (127.0.0.1:8000)'),
+                      backgroundColor: kIsWeb ? AppTheme.accentCyan.withOpacity(0.2) : AppTheme.surfaceLight,
+                      side: kIsWeb ? const BorderSide(color: AppTheme.accentCyan) : null,
+                      labelStyle: TextStyle(
+                        fontSize: 11,
+                        color: kIsWeb ? AppTheme.accentCyan : Colors.white,
+                        fontWeight: kIsWeb ? FontWeight.bold : FontWeight.normal,
+                      ),
                       onPressed: () {
-                        _urlController.text = 'http://10.0.2.2:8000';
+                        _urlController.text = 'http://127.0.0.1:8000';
                         _testConnection();
                       },
                     ),
+                    if (!kIsWeb)
+                      ActionChip(
+                        label: const Text('Máy ảo Android (10.0.2.2:8000)'),
+                        backgroundColor: AppTheme.surfaceLight,
+                        labelStyle: const TextStyle(fontSize: 11, color: Colors.white),
+                        onPressed: () {
+                          _urlController.text = 'http://10.0.2.2:8000';
+                          _testConnection();
+                        },
+                      ),
                     ActionChip(
-                      label: const Text('Localhost (127.0.0.1)'),
+                      label: const Text('localhost:8000'),
                       backgroundColor: AppTheme.surfaceLight,
                       labelStyle: const TextStyle(fontSize: 11, color: Colors.white),
                       onPressed: () {
-                        _urlController.text = 'http://127.0.0.1:8000';
+                        _urlController.text = 'http://localhost:8000';
                         _testConnection();
                       },
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
+
+                if (kIsWeb) ...[
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    decoration: BoxDecoration(
+                      color: AppTheme.surfaceLight,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(Icons.info_outline, size: 18, color: AppTheme.accentCyan),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Trên Web, Python Backend API cần chạy tại http://127.0.0.1:8000. Hãy khởi chạy file start_backend.bat trước khi thao tác bộ lọc màu.',
+                            style: TextStyle(color: AppTheme.textSecondary, fontSize: 12, height: 1.3),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 // Auto discover on Wi-Fi button
                 SizedBox(

@@ -27,7 +27,16 @@ class ApiService {
   }
 
   set baseUrl(String url) {
-    _baseUrl = url.trim().replaceAll(RegExp(r'/+$'), '');
+    String clean = url.trim().replaceAll(RegExp(r'/+$'), '');
+    if (clean.isEmpty) {
+      clean = defaultBaseUrl();
+    }
+    // Prevent accidental loopback to the Web app shelf server itself (which returns 404)
+    if (kIsWeb && Uri.base.port != 0 && Uri.base.port != 8000 && clean.contains(':${Uri.base.port}')) {
+      debugPrint('PhotoCraft: Phat hien dia chi trung cong Web (${Uri.base.port}). Tu dong chuyen ve cong Backend 8000.');
+      clean = 'http://127.0.0.1:8000';
+    }
+    _baseUrl = clean;
     serverUrlNotifier.value = _baseUrl;
     _saveToPrefs(_baseUrl);
   }
@@ -47,7 +56,11 @@ class ApiService {
       final prefs = await SharedPreferences.getInstance();
       final savedUrl = prefs.getString(_prefKey);
       if (savedUrl != null && savedUrl.isNotEmpty) {
-        _baseUrl = savedUrl;
+        if (kIsWeb && Uri.base.port != 0 && Uri.base.port != 8000 && savedUrl.contains(':${Uri.base.port}')) {
+          _baseUrl = defaultBaseUrl();
+        } else {
+          _baseUrl = savedUrl;
+        }
         serverUrlNotifier.value = _baseUrl;
       }
     } catch (_) {}
@@ -82,14 +95,19 @@ class ApiService {
       return true;
     }
 
-    // 2. Build candidate list prioritizing Wi-Fi network
+    // 2. Build candidate list prioritizing active platform
     final List<String> candidates = [];
 
-    // Saved IP & Known Dev Wi-Fi IP
-    candidates.add(defaultWifiDevIp);
+    if (kIsWeb) {
+      // On Web, localhost is always the host machine running the Python API
+      candidates.add('http://127.0.0.1:8000');
+      candidates.add('http://localhost:8000');
+      candidates.add(defaultWifiDevIp);
+    } else {
+      // Saved IP & Known Dev Wi-Fi IP
+      candidates.add(defaultWifiDevIp);
 
-    // Dynamic Wi-Fi subnet discovery
-    if (!kIsWeb) {
+      // Dynamic Wi-Fi subnet discovery
       try {
         final interfaces = await NetworkInterface.list(
           type: InternetAddressType.IPv4,
@@ -120,15 +138,20 @@ class ApiService {
       } catch (e) {
         debugPrint('Network interface probe error: $e');
       }
-    }
 
-    // Standard emulator & localhost fallbacks
-    candidates.add('http://10.0.2.2:8000');
-    candidates.add('http://127.0.0.1:8000');
-    candidates.add('http://localhost:8000');
+      // Standard emulator & localhost fallbacks
+      candidates.add('http://10.0.2.2:8000');
+      candidates.add('http://127.0.0.1:8000');
+      candidates.add('http://localhost:8000');
+    }
 
     // Deduplicate
     final uniqueCandidates = candidates.toSet().toList();
+
+    // On Web, remove candidates pointing to the web app's own port
+    if (kIsWeb && Uri.base.port != 0 && Uri.base.port != 8000) {
+      uniqueCandidates.removeWhere((u) => u.contains(':${Uri.base.port}'));
+    }
 
     // Probe in fast parallel batches of 4
     for (int i = 0; i < uniqueCandidates.length; i += 4) {

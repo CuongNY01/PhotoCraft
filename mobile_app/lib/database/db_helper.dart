@@ -11,8 +11,21 @@ import '../models/photo_record.dart';
 class DBHelper {
   static final DBHelper instance = DBHelper._init();
   static Database? _database;
+  static bool _factoryInitialized = false;
 
   DBHelper._init();
+
+  static void ensureDatabaseFactoryInitialized() {
+    if (_factoryInitialized) return;
+    if (kIsWeb) {
+      databaseFactory = databaseFactoryFfiWeb;
+      _factoryInitialized = true;
+    } else if (Platform.isWindows || Platform.isLinux) {
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+      _factoryInitialized = true;
+    }
+  }
 
   Future<Database> get database async {
     if (_database != null) return _database!;
@@ -21,12 +34,7 @@ class DBHelper {
   }
 
   Future<Database> _initDB(String filePath) async {
-    if (kIsWeb) {
-      databaseFactory = databaseFactoryFfiWeb;
-    } else if (Platform.isWindows || Platform.isLinux) {
-      sqfliteFfiInit();
-      databaseFactory = databaseFactoryFfi;
-    }
+    ensureDatabaseFactoryInitialized();
 
     String dbPath;
     if (kIsWeb) {
